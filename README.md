@@ -24,7 +24,7 @@ In the `mnist` folder, we give examples about how to train models that have smoo
 leads to better performance on noisy test data. Click through the notebooks in that folder to see more.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/image.png" width="800" />
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/image.png" width="1000" />
 </p>
 
 ### Gene Expression Data (graph)
@@ -33,7 +33,7 @@ connecting the features can be used to incorporate prior biological knowledge ab
 yield more biologically plausible explanations of drug response predictions, and improve test error.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/graph.png" width="800" />
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/graph.png" width="1000" />
 </p>
 
 ### Tabular Data (sparsity)
@@ -41,7 +41,7 @@ In the `sparsity` folder, the notebook shows how encouraging inequality in the d
 can build sparser models that can perform more accurately when training data is limited. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/sparsity.png" width="800" />
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/sparsity.png" width="1000" />
 </p>
 
 ## Installation
