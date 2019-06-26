@@ -3,7 +3,7 @@
 A repository for training explainable models using attribution priors.
 
 This repository contains tools for connecting the machine learning topics of *model priors* 
-and *model explanations* with a new method called *attribution priors*, discussed in our paper 
+and *model explanations* with a new method called *attribution priors*, discussed in our [paper](https://arxiv.org/abs/1906.10670) 
 "Learning Explainable Models Using Attribution Priors". This package contains: 
 * A differentiable axiomatic feature attribution method called *expected gradients*.
 * Tensorflow operations to directly regularize expected gradients attributions during training. 
