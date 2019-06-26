@@ -23,14 +23,26 @@ in the top level directory of this repository, and the [Installation and Usage S
 In the `mnist` folder, we give examples about how to train models that have smoother attributions over pixels, which in turn
 leads to better performance on noisy test data. Click through the notebooks in that folder to see more.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/image.png" width="400" />
+</p>
+
 ### Gene Expression Data (graph)
 In the `graph` folder, the notebook shows how penalizing differences between the attributions of neighbor in an arbitrary graph 
 connecting the features can be used to incorporate prior biological knowledge about the relationships between genes, 
 yield more biologically plausible explanations of drug response predictions, and improve test error.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/graph.png" width="400" />
+</p>
+
 ### Tabular Data (sparsity)
 In the `sparsity` folder, the notebook shows how encouraging inequality in the distribution of feature attributions 
 can build sparser models that can perform more accurately when training data is limited. 
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/sparsity.png" width="400" />
+</p>
 
 ## Installation
 The easiest way to install this package is by using pip:
