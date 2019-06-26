@@ -4,20 +4,20 @@ A repository for training explainable models using attribution priors.
 
 This repository contains tools for connecting the machine learning topics of *model priors* 
 and *model explanations* with a new method called *attribution priors*, discussed in our paper 
-"Learning Explainable Models Using Attribution Priors. This package contains: 
+"Learning Explainable Models Using Attribution Priors". This package contains: 
 * A differentiable axiomatic feature attribution method called *expected gradients*.
 * Tensorflow operations to directly regularize expected gradients attributions during training. 
 * Examples of how arbitrary differentiable functions of expected gradient attributions can be regularized during training to encode prior knowledge about a modeling task. 
+
+For more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook
+in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
 
 ## Examples 
 
 So what exactly are attribution priors and why would you want to use them? The examples here provide three ways in which
-you can use attribution priors to imrpove network performance and interpretability. We use these examples
+you can use attribution priors to improve network performance and interpretability. We use these examples
 in our paper. However, attribution priors are not limited to the examples here.
-
-If you need more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook
-in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
 ### Image Data (mnist)
 In the `mnist` folder, we give examples about how to train models that have smoother attributions over pixels, which in turn
@@ -28,7 +28,7 @@ leads to better performance on noisy test data. Click through the notebooks in t
 </p>
 
 ### Gene Expression Data (graph)
-In the `graph` folder, the notebook shows how penalizing differences between the attributions of neighbor in an arbitrary graph 
+In the `graph` folder, the notebook shows how penalizing differences between the attributions of neighbors in an arbitrary graph 
 connecting the features can be used to incorporate prior biological knowledge about the relationships between genes, 
 yield more biologically plausible explanations of drug response predictions, and improve test error.
 
@@ -53,7 +53,7 @@ Alternatively, you can clone this repository directly to explore and re-run the 
 
 ## Compatability
 
-The code in this repository was written to support TensorFlow versions r1.8 and up. Although we plan to support the Keras API in the future,
+The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. Although we plan to support the Keras API in the future,
 only Keras models that directly use TensorFlow sessions to train are supported.
 
 ## Usage
@@ -133,5 +133,7 @@ for i in range(num_training_steps):
 ```
 
 It is important that you set `train_eg: True` when you are running any operation related to the expected gradients tensor. 
-If you do not do so, the code will give strange errors. And that is all there is to it! Your code will simultaneously minimize
+If you do not do so, the code will give strange errors. 
+
+And that is all there is to it! Your code will simultaneously minimize
 both your task objective and also whatever attribution prior you defined.
