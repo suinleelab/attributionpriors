@@ -119,7 +119,7 @@ class AttributionPriorExplainer(object):
                 t_tensor = tf.cast(t_tensor, dtype=batch_input_op.dtype)
                 t_tensor.set_shape([None, k_])
             else:
-                t_tensor = tf.linspace(start=0.0, stop=1.0, num=k, name='linspace_t')
+                t_tensor = tf.linspace(start=0.0, stop=1.0, num=k_, name='linspace_t')
                 t_tensor = tf.expand_dims(t_tensor, axis=0)
                 t_tensor = tf.tile(t_tensor, [batch_size, 1], name='t_tensor')
                 t_tensor = tf.cast(t_tensor, dtype=batch_input_op.dtype)
