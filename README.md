@@ -9,7 +9,8 @@ and *model explanations* with a new method called *attribution priors*, discusse
 * Tensorflow operations to directly regularize expected gradients attributions during training. 
 * Examples of how arbitrary differentiable functions of expected gradient attributions can be regularized during training to encode prior knowledge about a modeling task. 
 
-For more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook
+For more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook 
+(for older versions of TensorFlow) and the `example_usage_tf2.ipynb` notebook (for TensorFlow 2.0 and above)
 in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
 
@@ -53,10 +54,71 @@ Alternatively, you can clone this repository directly to explore and re-run the 
 
 ## Compatability
 
-The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. Although we plan to support the Keras API in the future,
-only Keras models that directly use TensorFlow sessions to train are supported.
+The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-exceution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions).
 
-## Usage
+## Usage: Training with Eager Execution
+
+This code provides an API for users who are using TensorFlow with eager execution, which is the default in TensorFlow 2.0 and above. The API change is rather simple in eager exceution and follows the following steps:
+
+### 1: Importing
+```python
+#Other import statements...
+from attributionpriors import eager_ops
+```
+
+### 2: Manually writing the train_step
+Where normally you would write code like this:
+```python
+@tf.function
+def train_step(inputs, labels, model):
+    with tf.GradientTape() as tape:
+        tape.watch(inputs)
+        predictions = model(inputs, training=True)
+        pred_loss = loss_fn(labels, predictions)
+        total_loss = pred_loss
+
+        if len(model.losses) > 0:
+            regularization_loss = tf.math.add_n(model.losses)
+            total_loss = total_loss + regularization_loss
+
+    gradients = tape.gradient(total_loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+```
+
+Now you should add the following lines:
+```diff
+@tf.function
+def train_step(inputs, labels, model):
+    with tf.GradientTape() as tape:
+        tape.watch(inputs)
+        predictions = model(inputs, training=True)
+        pred_loss = loss_fn(labels, predictions)
+        total_loss = pred_loss
+
+        if len(model.losses) > 0:
+            regularization_loss = tf.math.add_n(model.losses)
+            total_loss = total_loss + regularization_loss
+
++        attributions = eager_ops.expected_gradients(inputs, labels, model)
++        attribution_loss = ap_loss_func(attributions, model)
++        total_loss = total_loss + lamb * attribution_loss
+        
+    gradients = tape.gradient(total_loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+```
+
+where `ap_loss_func` is some loss function on top of your attributions, and `lamb` is a scalar
+penalty controlling the trade-off between penalizing attributions and your standard training loss. 
+In the image case, we use `tf.reduce_mean(tf.image.total_variation())`, the mean of the total variation across the attributions. 
+And that's it! If you want a more in-depth example, see the `example_usage_tf2.ipynb` notebook.
+
+### Why can't we use the fit function?
+Overloading the fit function is, well, more difficult and makes it harder to specify complex penalties on your attributions. 
+It would require sub-classing the tf.keras.model API, which requires handling a variety of edge cases. If you want to 
+take on this project, feel free to do so, but we don't have plans to support it as of right now.
+
+
+## Usage: Training with TensorFlow Sessions
 
 This package provides a simple API that can be used to define attribution priors over neural networks that can be dropped in to existing TensorFlow code.
 In order to train using our implementation of attribution priors in your own code, you need to follow the following four steps:
