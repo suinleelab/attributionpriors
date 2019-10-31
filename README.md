@@ -54,7 +54,7 @@ Alternatively, you can clone this repository directly to explore and re-run the 
 
 ## Compatability
 
-The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-exceution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions).
+The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-execution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions).
 
 ## Usage: Training with Eager Execution
 
