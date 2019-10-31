@@ -3,7 +3,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
      name='attributionpriors',  
-     version='0.1.2',
+     version='0.1.3',
      author="The Lee Lab at UW",
      author_email="psturm@cs.washington.edu",
      description="Tools for training explainable models using attribution priors.",
