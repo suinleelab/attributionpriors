@@ -199,3 +199,52 @@ If you do not do so, the code will give strange errors.
 
 And that is all there is to it! Your code will simultaneously minimize
 both your task objective and also whatever attribution prior you defined.
+
+## Usage: Training with PyTorch
+
+This code provides an API for users who are using PyTorch to train their models.
+
+### 1: Importing
+```python
+#Other import statements...
+from attributionpriors.pytorch_ops import AttributionPriorExplainer
+```
+
+### 2: Initializing AttributionPriorExplainer
+Before training, initialize the AttributionPriorExplainer object with the PyTorch Dataset object you want to use as background (we recommend using the full training dataset), the batch size, and the k parameter (number of background references per foreground samples).
+```python
+APExp = AttributionPriorExplainer(background_dataset, batch_size,k=1)
+```
+
+### 3: Adding Expected Gradients Calculation to Training Step
+Where your normal training loop in PyTorch might look like the following...
+```python
+for features, labels in train_loader:
+    features, labels = features.cuda().float(), labels.cuda().float()
+    optimizer.zero_grad()
+        
+    outputs = model(features)
+    
+    loss = torch.nn.MSELoss(outputs, labels)
+    
+    loss.backward(retain_graph=True)
+    optimizer.step()
+    train_losses.append(loss.item())
+```
+Now simply add the following lines to, for example, add an L1 penalty on the expected gradients...
+```diff
+for features, labels in train_loader:
+    features, labels = features.cuda().float(), labels.cuda().float()
+    optimizer.zero_grad()
+        
+    outputs = model(features)
+    
+-   loss = torch.nn.MSELoss(outputs, labels)
++   expected_gradients = APExp.shap_values(model,features)
++   attribution_prior = torch.norm(expected_gradients, p=1)
++   loss = torch.nn.MSELoss(outputs, labels) + attribution_prior
+    
+    loss.backward(retain_graph=True)
+    optimizer.step()
+    train_losses.append(loss.item())
+```
