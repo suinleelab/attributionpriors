@@ -6,7 +6,7 @@ This repository contains tools for connecting the machine learning topics of *mo
 and *model explanations* with a new method called *attribution priors*, discussed in our [paper](https://arxiv.org/abs/1906.10670) 
 "Learning Explainable Models Using Attribution Priors". This package contains: 
 * A differentiable axiomatic feature attribution method called *expected gradients*.
-* Tensorflow operations to directly regularize expected gradients attributions during training. 
+* Tensorflow and PyTorch operations to directly regularize expected gradients attributions during training. 
 * Examples of how arbitrary differentiable functions of expected gradient attributions can be regularized during training to encode prior knowledge about a modeling task. 
 
 For more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook 
