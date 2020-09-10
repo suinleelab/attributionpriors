@@ -1,5 +1,7 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
+
+tf.disable_v2_behavior()
 
 class AttributionPriorExplainer(object):
     def __init__(self, random_alpha=True):
@@ -91,7 +93,8 @@ class AttributionPriorExplainer(object):
         num_input_dims = len(input_dims)
             
         def samples_input_fn():
-            if tf.contrib.framework.is_tensor(background_ref_op):
+            if isinstance(background_ref_op, (tf.Tensor, tf.SparseTensor, tf.Variable)):
+#             if tf.contrib.framework.is_tensor(background_ref_op):
                 self.background_ref_op = background_ref_op
                 if k is not None:
                     print("Warning: value `{}` of parameter k will be ignored because background_ref_op was an input tensor".format(k))
