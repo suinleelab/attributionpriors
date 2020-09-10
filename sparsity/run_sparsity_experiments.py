@@ -18,9 +18,14 @@ os.environ["CUDA_VISIBLE_DEVICES"]=str(DEV)
 # Where to save results
 outdir = 'results/'
 
-# Code for TF1
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow
+# If using tensorflow v1, proceed as normal
+if int(tensorflow.__version__[0])<2:
+    tf = tensorflow
+# If using v2, use the compat module and disable tf2 behavior
+else:
+    tf = tensorflow.compat.v1
+    tf.disable_v2_behavior()
 
 import numpy as np
 import os, sys

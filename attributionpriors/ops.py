@@ -1,7 +1,13 @@
-import tensorflow.compat.v1 as tf
+import tensorflow
+# If using tensorflow v1, proceed as normal
+if int(tensorflow.__version__[0])<2:
+    tf = tensorflow
+# If using v2, use the compat module and disable tf2 behavior
+else:
+    tf = tensorflow.compat.v1
+    tf.disable_v2_behavior()
 import numpy as np
 
-tf.disable_v2_behavior()
 
 class AttributionPriorExplainer(object):
     def __init__(self, random_alpha=True):
