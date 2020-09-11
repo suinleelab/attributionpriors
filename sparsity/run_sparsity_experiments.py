@@ -104,7 +104,7 @@ def sqfactors(n):
 dtype = tf.float64
 
 # Initialize datasets
-references_per_batch, dset_batch_size = 1,100#50,100#sqfactors(Xtrain_ss.shape[0])#168,180
+references_per_batch, dset_batch_size = 1,100
 ref_repeats = 100
 references_per_batch *= ref_repeats
 train_set = make_dataset(Xtrain_ss,np.vstack((ytrain,1-ytrain)).T.astype(np.float64),batch_size=dset_batch_size,shuffle=True,buffer_size=800)
@@ -127,17 +127,18 @@ valid_iter  = valid_set.make_initializable_iterator()
 test_iter  = test_set.make_initializable_iterator()
 ones_iter = ones_set.make_initializable_iterator()
 
+# GPU options (allow growth)
 config = tf.ConfigProto()
 config.gpu_options.allow_growth=True
 sess = tf.Session(config=config)
 
+# Dataset handles
 train_handle = sess.run(train_iter.string_handle())
 valid_handle  = sess.run(valid_iter.string_handle())
 test_handle  = sess.run(test_iter.string_handle())
 ones_handle  = sess.run(ones_iter.string_handle())
 
-# references_per_batch = 35
-ref_ss = Xtrain_ss#np.zeros_like(Xtrain_ss)
+ref_ss = Xtrain_ss
 reference_dataset = tf.data.Dataset.from_tensor_slices((np.repeat(ref_ss,ref_repeats,axis=0)))
 reference_dataset = reference_dataset.shuffle(1000)
 reference_dataset = reference_dataset.batch(dset_batch_size * references_per_batch)
@@ -146,9 +147,10 @@ reference_iter    = reference_dataset.make_one_shot_iterator()
 background_batch = reference_iter.get_next()
 background_reference_op = tf.reshape(background_batch, [-1, references_per_batch, d])
 
+# Shorthand for common data 
 X, y, R = x_pl, y_true, background_reference_op
 
-
+# Names for indices into results tuple, ie t[EG] gives you the EG values
 PRED, EG, COST, OPT, EGOPT, EGFLAG, EXPLAINER, EGLMBD, L1LMBD, DROPLMBD = range(10)
 
 
@@ -174,7 +176,7 @@ def egmodel(X,R,layers=[512],eg=None,l1=None,dropout=None):
     else:
         output_layer = tf.layers.Dense(2)
         output = output_layer(cond_input_op)
-    y_pred = tf.nn.sigmoid(output)#model(cond_input_op)
+    y_pred = tf.nn.sigmoid(output)
     eg_op = explainer.shap_value_op(output, cond_input_op, y[:,1])
     
     cost = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_pred,labels=y)
@@ -196,7 +198,7 @@ def egmodel(X,R,layers=[512],eg=None,l1=None,dropout=None):
     train_eg_op = tf.train.GradientDescentOptimizer(learning_rate=1.0).minimize(reg_loss_op)
     return (y_pred, eg_op, total_cost, optimizer, train_eg_op, train_eg, explainer, reg_lambda, l1_strength)
 
-# L1 on gradient explanations (as in Ross) or gradsxinputs (better perf)
+# L1 on gradient explanations (as in Ross); also flag for gradxinp (works well but not previously used as an attribution prior)
 def l1grad(X,R,layers=[512],eg=None,l1=None,dropout=None,inputs=False):
     layers = [l for l in layers]
     eg_strength = eg if eg else 0.0
@@ -223,7 +225,7 @@ def l1grad(X,R,layers=[512],eg=None,l1=None,dropout=None,inputs=False):
         kernel = output_layer.kernel
     
     
-    y_pred = tf.nn.sigmoid(output)#model(cond_input_op)
+    y_pred = tf.nn.sigmoid(output)
     eg_op = explainer.shap_value_op(output, cond_input_op, y[:,1])
     grads = tf.gradients(output[:,1],X) # Train with gradients but use EG for explanations (you should probably use this)
     if inputs: grads *= X
@@ -233,7 +235,7 @@ def l1grad(X,R,layers=[512],eg=None,l1=None,dropout=None,inputs=False):
     optimizer = tf.train.GradientDescentOptimizer(learning_rate=1.0).minimize(total_cost)
     
     l1_reg = tf.reduce_mean(tf.abs(kernel)) * l1_strength 
-    rmad_loss = tf.reduce_mean(tf.abs(tf.cast(grads,tf.float32)))#tf.reduce_mean(mad_loss)/tf.reduce_mean(weighted_abs_loss)
+    rmad_loss = tf.reduce_mean(tf.abs(tf.cast(grads,tf.float32)))
     
     reg_lambda = tf.constant(eg_strength,dtype=tf.float32)
     reg_loss_op = -rmad_loss * reg_lambda
@@ -242,7 +244,7 @@ def l1grad(X,R,layers=[512],eg=None,l1=None,dropout=None,inputs=False):
     train_eg_op = tf.train.GradientDescentOptimizer(learning_rate=1.0).minimize(reg_loss_op)
     return (y_pred, eg_op, total_cost, optimizer, train_eg_op, train_eg, explainer, reg_lambda, l1_strength)
 
-# Gini on gradients (sorta-Ross) or gradsxinputs (better perf, hopefully)
+# Gini on gradients (sorta-Ross); also flag for gradxinp (works well but not previously used as an attribution prior)
 def ginigrad(X,R,layers=[512],eg=None,l1=None,dropout=None,inputs=False):
     layers = [l for l in layers]
     eg_strength = eg if eg else 0.0
@@ -314,7 +316,7 @@ def sglmodel(X,R,layers=[512],eg=None,l1=None,dropout=None):
         kernel = output_layer.kernel
     
     
-    y_pred = tf.nn.sigmoid(output)#model(cond_input_op)
+    y_pred = tf.nn.sigmoid(output)
     eg_op = explainer.shap_value_op(output, cond_input_op, y[:,1])
     
     cost = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_pred,labels=y)
@@ -375,7 +377,7 @@ def newsgl(X,R,layers=[512],eg=None,l1=None,dropout=None):
     
     
     kernel = kernels[0]
-    y_pred = tf.nn.sigmoid(output)#model(cond_input_op)
+    y_pred = tf.nn.sigmoid(output)
     eg_op = explainer.shap_value_op(output, cond_input_op, y[:,1])
     
     cost = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_pred,labels=y)
@@ -428,7 +430,7 @@ def l1model(X,R,layers=[512],eg=None,l1=None,dropout=None):
         kernels.append(kernel)
     
     
-    y_pred = tf.nn.sigmoid(output)#model(cond_input_op)
+    y_pred = tf.nn.sigmoid(output)
     eg_op = explainer.shap_value_op(output, cond_input_op, y[:,1])
     
     cost = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_pred,labels=y)
@@ -450,7 +452,7 @@ def l1model(X,R,layers=[512],eg=None,l1=None,dropout=None):
     return (y_pred, eg_op, total_cost, optimizer, train_eg_op, train_eg, explainer, reg_lambda, l1_strength)    
 
 
-# ## Train
+# Indices to training results tuple
 PRED, EG, COST, OPT, EGOPT, EGFLAG, EXPLAINER = range(7)
 
 def train(y_pred, eg_op, total_cost, optimizer, train_eg_op, train_eg, explainer, reg_lambda, l1_strength,
@@ -461,7 +463,7 @@ def train(y_pred, eg_op, total_cost, optimizer, train_eg_op, train_eg, explainer
         loss = 0.0
         _, eg = sess.run([train_eg_op, eg_op], feed_dict={handle: ones_handle, train_eg: True,reg_lambda:egstrength,l1_strength:l1strength})
 
-# Eval
+# Evaluation functions
 def fastpredict(truth,output,X,sess=sess):
     return sess.run(output,feed_dict={x_pl:X,y:np.vstack((truth,1-truth)).T})
 predict=fastpredict
@@ -567,7 +569,7 @@ def train_until(m,params,sess=sess,rounds=1000,iterator=list):
             failed = 0
             return (r,x,g,s,p,d)
         except ValueError:
-            pass #return None
+            pass
     return None
 
 # Train first models
@@ -686,7 +688,6 @@ for a in tqdm(range(n)):
 
 
 # Compile results
-methods = ['gini','ginigrad','ginigradinp','l1grad','l1gradinp','l1','sgl','newsgl','unreg']
 unreg_results = []
 
 for vresults, tresults, tpreds, name in zip(
