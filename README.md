@@ -46,11 +46,10 @@ can build sparser models that can perform more accurately when training data is 
 </p>
 
 ## Installation
-The easiest way to install this package is by using pip:
+The easiest way to install this package is by cloning the repository:
 ```
-pip install attributionpriors
+git clone https://github.com/suinleelab/attributionpriors.git
 ```
-Alternatively, you can clone this repository directly to explore and re-run the examples provided here.
 
 ## Compatability
 
