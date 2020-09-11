@@ -18,11 +18,16 @@ in the top level directory of this repository, and the [Installation and Usage S
 
 The code in this repository was written to support [TensorFlow versions](https://www.tensorflow.org/install) r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-execution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions). We also now have support for [PyTorch](https://pytorch.org/get-started/locally/), which has been tested with Python 3 - see [Training with PyTorch](#usage-training-with-pytorch).
 
+Code has been tested for GPU compatability on a Lambda Blade GPU Server running CentOS 7.8, and for CPU compatibility on a MacBook Pro running macOS Catalina 10.15.4.
+
 ## Installation
 The easiest way to install this package is by cloning the repository:
 ```
 git clone https://github.com/suinleelab/attributionpriors.git
 ```
+
+## Demo
+The quickest demo to run the code is the `Saturation Demo (PyTorch).ipynb` notebook, available in the main directory. This notebook should run in a matter of minutes using only cpu, and also illustrates the benefits of expected gradients feature attributions over other feature attribution methods for attribution priors.
 
 ## Examples 
 
