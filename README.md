@@ -27,7 +27,9 @@ git clone https://github.com/suinleelab/attributionpriors.git
 ```
 
 ## Demo
-The quickest demo to run the code is the `Saturation Demo (PyTorch).ipynb` notebook, available in the main directory. This notebook should run in a matter of minutes using only cpu, and also illustrates the benefits of expected gradients feature attributions over other feature attribution methods for attribution priors.
+The quickest demo to run the code is the `Saturation Demo (PyTorch).ipynb` notebook, available in the main directory. This notebook should run in a matter of minutes using only cpu, and also illustrates the benefits of expected gradients feature attributions over other feature attribution methods for attribution priors. For quick demos in Tensorflow, see the `example_usage.ipynb` notebook 
+(for older versions of TensorFlow) and the `example_usage_tf2.ipynb` notebook (for TensorFlow 2.0 and above)
+in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
 ## Examples 
 
