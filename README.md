@@ -9,10 +9,20 @@ and *model explanations* with a new method called *attribution priors*, discusse
 * Tensorflow and PyTorch operations to directly regularize expected gradients attributions during training. 
 * Examples of how arbitrary differentiable functions of expected gradient attributions can be regularized during training to encode prior knowledge about a modeling task. 
 
-For more guidance about how to use this repository/how to train with attribution priors, see the `example_usage.ipynb` notebook 
+For more guidance about how to use this repository/how to train with attribution priors, one of the quickest demos is available in the
+`Saturation Demo (PyTorch).ipynb` notebook. For quick demos in Tensorflow, see the `example_usage.ipynb` notebook 
 (for older versions of TensorFlow) and the `example_usage_tf2.ipynb` notebook (for TensorFlow 2.0 and above)
 in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
+## Compatability
+
+The code in this repository was written to support [TensorFlow versions](https://www.tensorflow.org/install) r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-execution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions). We also now have support for [PyTorch](https://pytorch.org/get-started/locally/), which has been tested with Python 3 - see [Training with PyTorch](#usage-training-with-pytorch).
+
+## Installation
+The easiest way to install this package is by cloning the repository:
+```
+git clone https://github.com/suinleelab/attributionpriors.git
+```
 
 ## Examples 
 
@@ -44,16 +54,6 @@ can build sparser models that can perform more accurately when training data is 
 <p align="center">
   <img src="https://raw.githubusercontent.com/suinleelab/attributionpriors/master/images/sparsity.png" width="1000" />
 </p>
-
-## Installation
-The easiest way to install this package is by cloning the repository:
-```
-git clone https://github.com/suinleelab/attributionpriors.git
-```
-
-## Compatability
-
-The code in this repository was written to support TensorFlow versions r1.8 and up, and works with both Python 2 and 3. If you are using TensorFlow with eager execution/TensorFlow 2.0 and above, see [Training with Eager Execution](#usage-training-with-eager-execution). If you are training with TensorFlow Sessions (old-school TensorFlow), see [Training with TensorFlow Sessions](#usage-training-with-tensorflow-sessions). We also now have support for PyTorch, which has been tested with Python 3 - see [Training with PyTorch](#usage-training-with-pytorch).
 
 ## Usage: Training with Eager Execution
 
