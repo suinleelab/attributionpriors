@@ -8,7 +8,7 @@ n=100
 import sys, os
 
 # Run number/random seed for data splitting and batching
-RUN = 1126
+RUN = 256
 
 # Limit to a specific GPU
 DEV = 0
@@ -54,6 +54,8 @@ Xtv,Xtest, ytv, ytest = train_test_split(X,y,random_state=200)
 Xtrain, Xvalid, ytrain, yvalid = train_test_split(Xtv,ytv,random_state=100)
 
 np.random.seed(RUN)
+tf.set_random_seed(RUN)
+
 train_inds = np.random.choice(ytrain.shape[0],100)
 valid_inds = np.random.choice(yvalid.shape[0],100)
 Xtrain, ytrain = Xtrain.iloc[train_inds], ytrain[train_inds]
