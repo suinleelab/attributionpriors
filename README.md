@@ -9,8 +9,8 @@ and *model explanations* with a new method called *attribution priors*, discusse
 * Tensorflow and PyTorch operations to directly regularize expected gradients attributions during training. 
 * Examples of how arbitrary differentiable functions of expected gradient attributions can be regularized during training to encode prior knowledge about a modeling task. 
 
-For more guidance about how to use this repository/how to train with attribution priors, one of the quickest demos is available in the
-`Saturation Demo (PyTorch).ipynb` notebook. For quick demos in Tensorflow, see the `example_usage.ipynb` notebook 
+For more guidance about how to use this repository/how to train with attribution priors, one of the quickest demos for PyTorch is available in the
+`Convergence Demo.ipynb` notebook. For quick demos in Tensorflow, see the `example_usage.ipynb` notebook 
 (for older versions of TensorFlow) and the `example_usage_tf2.ipynb` notebook (for TensorFlow 2.0 and above)
 in the top level directory of this repository, and the [Installation and Usage Section](#installation) of this README. 
 
