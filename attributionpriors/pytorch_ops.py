@@ -36,9 +36,10 @@ def gather_nd(params, indices):
     
 
 class AttributionPriorExplainer(object):
-    def __init__(self, background_dataset, batch_size, random_alpha=True,k=1):
+    def __init__(self, background_dataset, batch_size, random_alpha=True,k=1,scale_by_inputs=True):
         self.random_alpha = random_alpha
         self.k = k
+        self.scale_by_inputs = scale_by_inputs
         self.batch_size = batch_size
         self.ref_set = background_dataset
         self.ref_sampler = DataLoader(
@@ -73,6 +74,11 @@ class AttributionPriorExplainer(object):
         # Grab a [batch_size, k]-sized interpolation sample
         if self.random_alpha:
             t_tensor = torch.FloatTensor(batch_size, k_).uniform_(0,1).cuda()
+        else:
+            if k_==1:
+                t_tensor = torch.cat([torch.Tensor([1.0]) for i in range(batch_size)]).cuda()
+            else:
+                t_tensor = torch.cat([torch.linspace(0,1,k_) for i in range(batch_size)]).cuda()
 
         shape = [batch_size, k_] + [1] * num_input_dims
         interp_coef = t_tensor.view(*shape)
@@ -139,7 +145,7 @@ class AttributionPriorExplainer(object):
         samples_input = self._get_samples_input(input_tensor, reference_tensor)
         samples_delta = self._get_samples_delta(input_tensor, reference_tensor)
         grad_tensor = self._get_grads(samples_input, model, sparse_labels)
-        mult_grads = samples_delta * grad_tensor
+        mult_grads = samples_delta * grad_tensor if self.scale_by_inputs else grad_tensor
         expected_grads = mult_grads.mean(1)
         return expected_grads
 
@@ -148,7 +154,7 @@ class VariableBatchExplainer(AttributionPriorExplainer):
     Subclasses AttributionPriorExplainer to avoid pre-specified batch size. Will adapt batch
     size based on shape of input tensor.
     """
-    def __init__(self, background_dataset, random_alpha=True):
+    def __init__(self, background_dataset, random_alpha=True,scale_by_inputs=True):
         """
         Arguments:
         background_dataset: PyTorch dataset - may not work with iterable-type (vs map-type) datasets
@@ -157,6 +163,7 @@ class VariableBatchExplainer(AttributionPriorExplainer):
         """
         self.random_alpha = random_alpha
         self.k = None
+        self.scale_by_inputs=scale_by_inputs
         self.ref_set = background_dataset
         self.ref_sampler = DataLoader(
                 dataset=background_dataset, 
@@ -204,7 +211,7 @@ class VariableBatchExplainer(AttributionPriorExplainer):
         samples_input = self._get_samples_input(input_tensor, reference_tensor)
         samples_delta = self._get_samples_delta(input_tensor, reference_tensor)
         grad_tensor = self._get_grads(samples_input, model, sparse_labels)
-        mult_grads = samples_delta * grad_tensor
+        mult_grads = samples_delta * grad_tensor if self.scale_by_inputs else grad_tensor
         expected_grads = mult_grads.mean(1)
 
         return expected_grads
@@ -215,7 +222,7 @@ class ExpectedGradientsModel(torch.nn.Module):
     produces SHAP values as well as predictions (controllable by 'shap_values'
     flag.
     """
-    def __init__(self,base_model,refset,k=1):
+    def __init__(self,base_model,refset,k=1,random_alpha=True,scale_by_inputs=True):
         """
         Arguments:
         base_model: PyTorch network that subclasses torch.nn.Module
@@ -227,7 +234,8 @@ class ExpectedGradientsModel(torch.nn.Module):
         self.k = k
         self.base = base_model
         self.refset = refset
-        self.exp = VariableBatchExplainer(self.refset)
+        self.random_alpha = random_alpha
+        self.exp = VariableBatchExplainer(self.refset,random_alpha=random_alpha,scale_by_inputs=scale_by_inputs)
     def forward(self,x,shap_values=False,sparse_labels=None,k=1):
         """
         Arguments:
