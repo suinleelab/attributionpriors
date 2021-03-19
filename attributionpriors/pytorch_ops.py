@@ -5,6 +5,8 @@ import torch
 from torch.autograd import grad
 from torch.utils.data import DataLoader
 
+DEFAULT_DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 def gather_nd(params, indices):
     """
     Args:
@@ -73,12 +75,12 @@ class AttributionPriorExplainer(object):
 
         # Grab a [batch_size, k]-sized interpolation sample
         if self.random_alpha:
-            t_tensor = torch.FloatTensor(batch_size, k_).uniform_(0,1).cuda()
+            t_tensor = torch.FloatTensor(batch_size, k_).uniform_(0,1).to(DEFAULT_DEVICE)
         else:
             if k_==1:
-                t_tensor = torch.cat([torch.Tensor([1.0]) for i in range(batch_size)]).cuda()
+                t_tensor = torch.cat([torch.Tensor([1.0]) for i in range(batch_size)]).to(DEFAULT_DEVICE)
             else:
-                t_tensor = torch.cat([torch.linspace(0,1,k_) for i in range(batch_size)]).cuda()
+                t_tensor = torch.cat([torch.linspace(0,1,k_) for i in range(batch_size)]).to(DEFAULT_DEVICE)
 
         shape = [batch_size, k_] + [1] * num_input_dims
         interp_coef = t_tensor.view(*shape)
@@ -101,7 +103,7 @@ class AttributionPriorExplainer(object):
     def _get_grads(self, samples_input, model, sparse_labels=None):
         samples_input.requires_grad = True
 
-        grad_tensor = torch.zeros(samples_input.shape).float().cuda()
+        grad_tensor = torch.zeros(samples_input.shape).float().to(DEFAULT_DEVICE)
 
         
         for i in range(self.k):
@@ -110,7 +112,7 @@ class AttributionPriorExplainer(object):
             # should check that users pass in sparse labels
             # Only look at the user-specified label
             if batch_output.size(1) > 1:
-                sample_indices = torch.arange(0,batch_output.size(0)).cuda()
+                sample_indices = torch.arange(0,batch_output.size(0)).to(DEFAULT_DEVICE)
                 indices_tensor = torch.cat([
                         sample_indices.unsqueeze(1), 
                         sparse_labels.unsqueeze(1)], dim=1)
@@ -119,7 +121,7 @@ class AttributionPriorExplainer(object):
             model_grads = grad(
                     outputs=batch_output,
                     inputs=particular_slice,
-                    grad_outputs=torch.ones_like(batch_output).cuda(),
+                    grad_outputs=torch.ones_like(batch_output).to(DEFAULT_DEVICE),
                     create_graph=True)
             grad_tensor[:,i,:] = model_grads[0]
         return grad_tensor
@@ -141,7 +143,7 @@ class AttributionPriorExplainer(object):
         reference_tensor = reference_tensor.view(
                 self.batch_size, 
                 self.k, 
-                *(shape[1:])).cuda()
+                *(shape[1:])).to(DEFAULT_DEVICE)
         samples_input = self._get_samples_input(input_tensor, reference_tensor)
         samples_delta = self._get_samples_delta(input_tensor, reference_tensor)
         grad_tensor = self._get_grads(samples_input, model, sparse_labels)
@@ -207,7 +209,7 @@ class VariableBatchExplainer(AttributionPriorExplainer):
         reference_tensor = reference_tensor.view(
                 n_input, 
                 self.k,
-                *(shape[1:])).cuda()
+                *(shape[1:])).to(DEFAULT_DEVICE)
         samples_input = self._get_samples_input(input_tensor, reference_tensor)
         samples_delta = self._get_samples_delta(input_tensor, reference_tensor)
         grad_tensor = self._get_grads(samples_input, model, sparse_labels)
